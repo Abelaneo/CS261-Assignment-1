@@ -37,12 +37,10 @@ struct list
  * This function should allocate and initialize a new, empty linked list and
  * return a pointer to it.
  */
-struct list* list_create()
-{
-    /*
-     * FIXED ME: 
-     */
-    return NULL;
+struct list* list_create() {
+    struct list* new_list = malloc(sizeof(struct list));
+    new_list->head = NULL;
+    return new_list;
 }
 
 /*
@@ -57,11 +55,23 @@ struct list* list_create()
  * list - the linked list to be destroyed.  May not be NULL.
  */
 
-void list_free(struct list* list)
-{
-    /*
-     * FIXED ME: 
-     */
+void list_free(struct list* list) {
+    if (list->head == NULL) {
+        free(list);
+        return;
+    }
+
+    struct node* prev = list->head;
+    struct node* cur = prev->next;
+
+    while (cur != NULL) {
+        free(prev);
+        prev = cur;
+        cur = cur->next;
+    }
+
+    free(prev);
+    free(list);
     return;
 }
 
@@ -81,9 +91,10 @@ void list_free(struct list* list)
 
 void list_insert(struct list* list, void* val)
 {
-    /*
-     * FIXED ME: 
-     */
+    struct node* new = malloc(sizeof(struct node));
+    new->val = val;
+    new->next = list->head;
+    list->head = new;
     return;
 }
 
@@ -103,9 +114,21 @@ void list_insert(struct list* list, void* val)
 
 void list_insert_end(struct list* list, void* val)
 {
-    /*
-     * FIXED ME: 
-     */
+    struct node* new = malloc(sizeof(struct node));
+    new->val = val;
+    new->next = NULL;
+
+    if (list->head == NULL) {
+        list->head = new;
+        return;
+    }
+
+    struct node* itr = list->head;
+    while (itr->next != NULL) {
+        itr = itr->next;
+    }
+
+    itr->next = new;
     return;
 }
 
@@ -150,9 +173,26 @@ void list_insert_end(struct list* list, void* val)
  */
 void list_remove(struct list* list, void* val, int (*cmp)(void* a, void* b))
 {
-    /*
-     * FIXED ME: 
-     */
+    if (list->head == NULL) {
+        return;
+    } else if (cmp(list->head->val, val) == 0) {
+        struct node* temp = list->head;
+        list->head = list->head->next;
+        free(temp);
+    }
+
+    struct node* prev = list->head;
+    struct node* itr = prev->next; 
+
+    while (itr != NULL) {
+        if (cmp(val, itr->val) == 0) {
+            prev->next = itr->next;
+            free(itr);
+            return;
+        }
+        itr = itr->next;
+        prev = prev->next;
+    }
     return;
 }
 
@@ -169,9 +209,22 @@ void list_remove(struct list* list, void* val, int (*cmp)(void* a, void* b))
  */
 void list_remove_end(struct list* list)
 {
-	/*
-     * FIXED ME: 
-     */
+    if (list->head == NULL) {
+        return;
+    } else if (list->head->next == NULL) {
+        free(list->head);
+        list->head = NULL;
+        return;
+    }
+
+
+    struct node* itr = list->head;
+    
+    while (itr->next->next != NULL) {
+        itr = itr->next;
+    }
+    free(itr->next);
+    itr->next = NULL;
     return;
 }
 
@@ -222,9 +275,20 @@ void list_remove_end(struct list* list)
  */
 int list_position(struct list* list, void* val, int (*cmp)(void* a, void* b))
 {
-    /*
-     * FIXED ME: 
-     */
+    if (list->head == NULL) {
+        return -1;
+    }
+
+    int idx = 0;
+    struct node* itr = list->head;
+
+    while (itr != NULL) {
+        if (cmp(val, itr->val) == 0) {
+            return idx;
+        }
+        idx++;
+        itr = itr->next;
+    }
     return -1;
 }
 
@@ -240,8 +304,36 @@ int list_position(struct list* list, void* val, int (*cmp)(void* a, void* b))
  */
 void list_reverse(struct list* list)
 {
-    /*
-     * FIXED ME: 
-     */
+    if (list->head == NULL) {
+        return;
+    } else if (list->head->next == NULL) {
+        return;
+    } else if (list->head->next->next == NULL) {
+        struct node* temp = list->head;
+        list->head = list->head->next;
+        list->head->next = temp;
+        temp->next = NULL;
+        return;
+    }
+
+    struct node* itr1 = list->head;
+    struct node* itr2 = itr1->next;
+    struct node* itr3 = itr2->next;
+
+    itr2->next = itr1;
+    itr1->next = NULL;
+    itr1 = itr2;
+    itr2 = itr3;
+    itr3 = itr3->next;
+
+    while (itr3 != NULL) {
+        itr2->next = itr1;
+        itr1 = itr2;
+        itr2 = itr3;
+        itr3 = itr3->next;
+    }
+
+    itr2->next = itr1;
+    list->head = itr2;
     return;
 }

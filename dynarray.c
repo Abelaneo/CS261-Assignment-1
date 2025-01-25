@@ -5,8 +5,8 @@
  * functions you might need.  Also, don't forget to include your name and
  * @oregonstate.edu email address below.
  *
- * Name:
- * Email:
+ * Name: Oscar Abelanet
+ * Email: abelaneo@oregonstate.edu
  */
 
 #include <stdlib.h>
@@ -36,11 +36,11 @@ struct dynarray {
  * capacity of 2.
  */
 struct dynarray* dynarray_create(){
-    /*
-     * FIXED ME: 
-     */
-
-    return NULL;
+    struct dynarray* darray_ptr = malloc(sizeof(struct dynarray));
+    darray_ptr->data = malloc(sizeof(void*) * 2);
+    darray_ptr->capacity = 2;
+    darray_ptr->size = 0;
+    return darray_ptr;
 }
 
 /*
@@ -55,9 +55,8 @@ struct dynarray* dynarray_create(){
  * da - the dynamic array to be destroyed.  May not be NULL.
  */
 void dynarray_free(struct dynarray* da){
-    /*
-     * FIXED ME: 
-     */
+    free(da->data);
+    free(da);
     return;
 }
 
@@ -66,10 +65,7 @@ void dynarray_free(struct dynarray* da){
  * number of elements stored in it, not the capacity).
  */
 int dynarray_size(struct dynarray* da){
-    /*
-     * FIXED ME: 
-     */
-    return 0;
+    return da->size;
 }
 
 /*
@@ -86,9 +82,17 @@ int dynarray_size(struct dynarray* da){
  *     which means that a pointer of any type can be passed.
  */
 void dynarray_insert(struct dynarray* da, void* val){
-    /*
-     * FIXED ME: 
-     */
+    if (da->size == da->capacity) {
+        da->capacity = da->capacity * 2;
+        void** new_arr = malloc(sizeof(void*) * da->capacity);
+        for (int i = 0; i < da->size; i++) {
+            new_arr[i] = da->data[i];
+        }
+        free(da->data);
+        da->data = new_arr;
+    }
+    da->data[da->size] = val;  
+    da->size++;
     return;
 }
 
@@ -108,11 +112,12 @@ void dynarray_insert(struct dynarray* da, void* val){
  *     elements stored in the array.
  */
 void dynarray_remove(struct dynarray* da, int idx){
-    /*
-     * FIXED ME: 
-     */
+    for (int i = idx + 1; i < da->size; i++) {
+        da->data[i - 1] = da->data[i];
+    }
+    da->data[da->size - 1] = NULL;
+    da->size--;
     return;
-
 }
 
 /*
@@ -125,11 +130,8 @@ void dynarray_remove(struct dynarray* da, int idx){
  *     of `idx` must be between 0 (inclusive) and n (exclusive), where n is the
  *     number of elements stored in the array.
  */
-void* dynarray_get(struct dynarray* da, int idx){
-    /*
-     * FIXED ME: 
-     */
-    return NULL;
+void* dynarray_get(struct dynarray* da, int idx){      
+    return da->data[idx];
 }
 
 /*
@@ -145,8 +147,6 @@ void* dynarray_get(struct dynarray* da, int idx){
  *     which means that a pointer of any type can be passed.
  */
 void dynarray_set(struct dynarray* da, int idx, void* val){
-    /*
-     * FIXED ME: 
-     */
+    da->data[idx] = val;
     return; 
 }

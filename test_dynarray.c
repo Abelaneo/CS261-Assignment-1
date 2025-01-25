@@ -102,7 +102,7 @@ void test_dynarray(struct student** students, int n)
         s = dynarray_get(da, i);
         if(s)
             printf("  %-16s\t%d\t%f\n", s->name, s->id, s->gpa);
-        
+       
         else
             printf("  NULL\n");
     }
